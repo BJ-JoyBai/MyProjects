@@ -31,6 +31,8 @@ namespace Lesson008
             }
             catch(Exception ex)
             {
+                L.W("Exception catched");
+                L.W(ex.StackTrace);
                 MessageBox.Show(ex.Message);
             }
         }
@@ -43,6 +45,8 @@ namespace Lesson008
             }
             catch (Exception ex)
             {
+                L.W("Exception catched");
+                L.W(ex.StackTrace);
                 MessageBox.Show(ex.StackTrace);//获取当前栈信息，指出错误位置
             }
         }
