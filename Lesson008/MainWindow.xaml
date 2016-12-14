@@ -11,9 +11,12 @@
             <Button Content="加载日志" Click="OnLoad_Click" />
             <Label Content="筛选目标：" />
             <TextBox Text="{Binding Pattern}" MinWidth="100" />
+            <Label Content="屏蔽目标：" />
+            <TextBox Text="{Binding NoPattern}" MinWidth="100" />
             <Button Content="筛选" Click="OnFilte_Click" />
+            <Slider Minimum="10" Maximum="64" Value="{Binding FontSize,ElementName=txtViewText}" Margin="10" Width="80"/>
         </ToolBar>
-        <TextBox 
+        <TextBox x:Name="txtViewText"
             Text="{Binding ViewText,Mode=OneWay}" 
             HorizontalScrollBarVisibility="Auto" 
             VerticalScrollBarVisibility="Auto" />

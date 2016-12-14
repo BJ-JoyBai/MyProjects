@@ -32,6 +32,18 @@ namespace Lesson008
         }
         private string _Pattern;
 
+        public string NoPattern
+        {
+            get { return _NoPattern; }
+            set
+            {
+                if (_NoPattern == value) return;
+                _NoPattern = value;
+                OnPropertyChanged("NoPattern");
+            }
+        }
+        private string _NoPattern;
+
         public string ViewText
         {
             get { return _ViewText; }
@@ -52,19 +64,28 @@ namespace Lesson008
         public void Filte()
         {
             StringBuilder aStringBuilder = new StringBuilder();
-            if (string.IsNullOrWhiteSpace(Pattern))//为空时，输出所有值，不匹配
+            /* if (string.IsNullOrWhiteSpace(Pattern))//为空时，输出所有值，不匹配
+             {
+                 foreach (string aLine in SourceTexts)
+                     aStringBuilder.AppendLine(aLine);
+             }
+             else
+             {
+                 Regex aRegex = new Regex(Pattern);
+                 foreach (string aLine in SourceTexts)
+                 {
+                     if (aRegex.IsMatch(aLine))
+                         aStringBuilder.AppendLine(aLine);
+                 }
+             }
+             ViewText = aStringBuilder.ToString();*/
+            Regex aRegex = string.IsNullOrWhiteSpace(Pattern) ? null : new Regex(Pattern);
+            Regex aNoRegex = string.IsNullOrWhiteSpace(NoPattern) ? null : new Regex(NoPattern);
+            foreach (string aLine in SourceTexts)
             {
-                foreach (string aLine in SourceTexts)
-                    aStringBuilder.AppendLine(aLine);
-            }
-            else
-            {
-                Regex aRegex = new Regex(Pattern);
-                foreach (string aLine in SourceTexts)
-                {
-                    if (aRegex.IsMatch(aLine))
-                        aStringBuilder.AppendLine(aLine);
-                }
+                if (aRegex != null && aRegex.IsMatch(aLine)) continue;
+                if (aNoRegex != null && aNoRegex.IsMatch(aLine)) continue;
+                aStringBuilder.AppendLine(aLine);
             }
             ViewText = aStringBuilder.ToString();
         }
