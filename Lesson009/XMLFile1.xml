@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<Contacts>
+  <Contact>
+    <Name>张三</Name>
+    <Moblie>132456</Moblie>
+    <Email>xxx@xxx</Email>
+      
+    </Contact>
+  </Contacts>

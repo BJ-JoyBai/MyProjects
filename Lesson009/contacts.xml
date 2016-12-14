@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Contacts>
+  <Contact>
+    <Name>张三</Name>
+    <Mobile>19000000</Mobile>
+    <Email>xxx@xxx</Email>
+  </Contact>
+  <Contact>
+    <Name>李四</Name>
+    <Mobile>180000000</Mobile>
+    <Email>yyy@yyy</Email>
+  </Contact>
+</Contacts>
