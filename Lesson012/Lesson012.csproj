@@ -71,6 +71,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MyData.cs">
+      <DependentUpon>MyData.dbml</DependentUpon>
+    </Compile>
     <Compile Include="MyData.designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

@@ -11,12 +11,18 @@
 
 namespace Lesson012
 {
-    using System.Data.Linq.Mapping;
-    using System.ComponentModel;
-    using System;
-
-
-    public partial class MyDataDataContext : System.Data.Linq.DataContext//内存数据
+	using System.Data.Linq;
+	using System.Data.Linq.Mapping;
+	using System.Data;
+	using System.Collections.Generic;
+	using System.Reflection;
+	using System.Linq;
+	using System.Linq.Expressions;
+	using System.ComponentModel;
+	using System;
+	
+	
+	public partial class MyDataDataContext : System.Data.Linq.DataContext
 	{
 		
 		private static System.Data.Linq.Mapping.MappingSource mappingSource = new AttributeMappingSource();
@@ -26,6 +32,9 @@ namespace Lesson012
     partial void InsertContact(Contact instance);
     partial void UpdateContact(Contact instance);
     partial void DeleteContact(Contact instance);
+    partial void InsertCallRecord(CallRecord instance);
+    partial void UpdateCallRecord(CallRecord instance);
+    partial void DeleteCallRecord(CallRecord instance);
     #endregion
 		
 		public MyDataDataContext(string connection) : 
@@ -59,9 +68,19 @@ namespace Lesson012
 				return this.GetTable<Contact>();
 			}
 		}
+		
+		public System.Data.Linq.Table<CallRecord> CallRecord
+		{
+			get
+			{
+				return this.GetTable<CallRecord>();
+			}
+		}
 	}
 	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="")]
+	[global::System.Data.Linq.Mapping.InheritanceMappingAttribute(Code="W", Type=typeof(WorkContact))]
+	[global::System.Data.Linq.Mapping.InheritanceMappingAttribute(Code="F", Type=typeof(FamilyContact))]
 	public partial class Contact : INotifyPropertyChanging, INotifyPropertyChanged
 	{
 		
@@ -75,6 +94,10 @@ namespace Lesson012
 		
 		private string _Email;
 		
+		private string _ContactType;
+		
+		private EntitySet<CallRecord> _CallRecord;
+		
     #region 可扩展性方法定义
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -87,10 +110,13 @@ namespace Lesson012
     partial void OnMobileChanged();
     partial void OnEmailChanging(string value);
     partial void OnEmailChanged();
+    partial void OnContactTypeChanging(string value);
+    partial void OnContactTypeChanged();
     #endregion
 		
 		public Contact()
 		{
+			this._CallRecord = new EntitySet<CallRecord>(new Action<CallRecord>(this.attach_CallRecord), new Action<CallRecord>(this.detach_CallRecord));
 			OnCreated();
 		}
 		
@@ -170,6 +196,304 @@ namespace Lesson012
 					this._Email = value;
 					this.SendPropertyChanged("Email");
 					this.OnEmailChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ContactType", CanBeNull=false, IsDiscriminator=true)]
+		public string ContactType
+		{
+			get
+			{
+				return this._ContactType;
+			}
+			set
+			{
+				if ((this._ContactType != value))
+				{
+					this.OnContactTypeChanging(value);
+					this.SendPropertyChanging();
+					this._ContactType = value;
+					this.SendPropertyChanged("ContactType");
+					this.OnContactTypeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Contact_CallRecord", Storage="_CallRecord", ThisKey="Id", OtherKey="ContactId")]
+		public EntitySet<CallRecord> CallRecord
+		{
+			get
+			{
+				return this._CallRecord;
+			}
+			set
+			{
+				this._CallRecord.Assign(value);
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_CallRecord(CallRecord entity)
+		{
+			this.SendPropertyChanging();
+			entity.Contact = this;
+		}
+		
+		private void detach_CallRecord(CallRecord entity)
+		{
+			this.SendPropertyChanging();
+			entity.Contact = null;
+		}
+	}
+	
+	public partial class WorkContact : Contact
+	{
+		
+		private string _Company;
+		
+    #region 可扩展性方法定义
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnCompanyChanging(string value);
+    partial void OnCompanyChanged();
+    #endregion
+		
+		public WorkContact()
+		{
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Company", CanBeNull=false)]
+		public string Company
+		{
+			get
+			{
+				return this._Company;
+			}
+			set
+			{
+				if ((this._Company != value))
+				{
+					this.OnCompanyChanging(value);
+					this.SendPropertyChanging();
+					this._Company = value;
+					this.SendPropertyChanged("Company");
+					this.OnCompanyChanged();
+				}
+			}
+		}
+	}
+	
+	public partial class FamilyContact : Contact
+	{
+		
+		private string _Brithday;
+		
+    #region 可扩展性方法定义
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnBrithdayChanging(string value);
+    partial void OnBrithdayChanged();
+    #endregion
+		
+		public FamilyContact()
+		{
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Brithday", CanBeNull=false)]
+		public string Brithday
+		{
+			get
+			{
+				return this._Brithday;
+			}
+			set
+			{
+				if ((this._Brithday != value))
+				{
+					this.OnBrithdayChanging(value);
+					this.SendPropertyChanging();
+					this._Brithday = value;
+					this.SendPropertyChanged("Brithday");
+					this.OnBrithdayChanged();
+				}
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="")]
+	public partial class CallRecord : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _Id;
+		
+		private System.Nullable<System.DateTimeOffset> _CallTime;
+		
+		private System.Nullable<int> _CallSeconds;
+		
+		private int _ContactId;
+		
+		private EntityRef<Contact> _Contact;
+		
+    #region 可扩展性方法定义
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnIdChanging(int value);
+    partial void OnIdChanged();
+    partial void OnCallTimeChanging(System.Nullable<System.DateTimeOffset> value);
+    partial void OnCallTimeChanged();
+    partial void OnCallSecondsChanging(System.Nullable<int> value);
+    partial void OnCallSecondsChanged();
+    partial void OnContactIdChanging(int value);
+    partial void OnContactIdChanged();
+    #endregion
+		
+		public CallRecord()
+		{
+			this._Contact = default(EntityRef<Contact>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Id", AutoSync=AutoSync.OnInsert, IsPrimaryKey=true, IsDbGenerated=true)]
+		public int Id
+		{
+			get
+			{
+				return this._Id;
+			}
+			set
+			{
+				if ((this._Id != value))
+				{
+					this.OnIdChanging(value);
+					this.SendPropertyChanging();
+					this._Id = value;
+					this.SendPropertyChanged("Id");
+					this.OnIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CallTime")]
+		public System.Nullable<System.DateTimeOffset> CallTime
+		{
+			get
+			{
+				return this._CallTime;
+			}
+			set
+			{
+				if ((this._CallTime != value))
+				{
+					this.OnCallTimeChanging(value);
+					this.SendPropertyChanging();
+					this._CallTime = value;
+					this.SendPropertyChanged("CallTime");
+					this.OnCallTimeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_CallSeconds")]
+		public System.Nullable<int> CallSeconds
+		{
+			get
+			{
+				return this._CallSeconds;
+			}
+			set
+			{
+				if ((this._CallSeconds != value))
+				{
+					this.OnCallSecondsChanging(value);
+					this.SendPropertyChanging();
+					this._CallSeconds = value;
+					this.SendPropertyChanged("CallSeconds");
+					this.OnCallSecondsChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ContactId")]
+		public int ContactId
+		{
+			get
+			{
+				return this._ContactId;
+			}
+			set
+			{
+				if ((this._ContactId != value))
+				{
+					if (this._Contact.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnContactIdChanging(value);
+					this.SendPropertyChanging();
+					this._ContactId = value;
+					this.SendPropertyChanged("ContactId");
+					this.OnContactIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Contact_CallRecord", Storage="_Contact", ThisKey="ContactId", OtherKey="Id", IsForeignKey=true)]
+		public Contact Contact
+		{
+			get
+			{
+				return this._Contact.Entity;
+			}
+			set
+			{
+				Contact previousValue = this._Contact.Entity;
+				if (((previousValue != value) 
+							|| (this._Contact.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Contact.Entity = null;
+						previousValue.CallRecord.Remove(this);
+					}
+					this._Contact.Entity = value;
+					if ((value != null))
+					{
+						value.CallRecord.Add(this);
+						this._ContactId = value.Id;
+					}
+					else
+					{
+						this._ContactId = default(int);
+					}
+					this.SendPropertyChanged("Contact");
 				}
 			}
 		}
